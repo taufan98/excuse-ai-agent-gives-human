@@ -20,5 +20,11 @@ if not LINE.strip():
 
 out_dir = Path(os.environ.get("MAKEFUN_OUTPUT_DIR", "/output"))
 out_dir.mkdir(parents=True, exist_ok=True)
-(out_dir / "entry.txt").write_text(LINE, encoding="utf-8")
-print(f"Wrote {len(LINE)} characters to {out_dir / 'entry.txt'}")
+target = out_dir / "entry.txt"
+target.write_text(LINE, encoding="utf-8")
+# Read back what was written: the grader reads this exact file, so fail loudly
+# here rather than shipping a truncated or re-encoded entry.
+written = target.read_text(encoding="utf-8")
+if written != LINE:
+    raise SystemExit("entry.txt read-back mismatch")
+print(f"Wrote {len(LINE)} characters to {target}")
